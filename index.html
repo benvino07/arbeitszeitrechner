@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arbeitszeitrechner</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: inline-block;
+            width: 100px;
+            margin-right: 10px;
+        }
+        input {
+            padding: 8px;
+            width: 100px;
+            box-sizing: border-box;
+        }
+        .time-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <h1>Arbeitszeitrechner</h1>
+    <div class="form-group">
+        <label for="targetHours">Ziel-Arbeitszeit (in Stunden):</label>
+        <input type="number" id="targetHours" value="7.8" step="0.1">
+    </div>
+
+    <h2>Arbeitsblöcke</h2>
+    <div class="form-group time-row">
+        <label for="start1">Kommen 1:</label>
+        <input type="time" id="start1">
+        <label for="end1">Gehen 1:</label>
+        <input type="time" id="end1">
+    </div>
+
+    <div class="form-group time-row">
+        <label for="start2">Kommen 2:</label>
+        <input type="time" id="start2">
+        <label for="end2">Gehen 2:</label>
+        <input type="time" id="end2">
+    </div>
+
+    <div class="form-group time-row">
+        <label for="start3">Kommen 3:</label>
+        <input type="time" id="start3">
+        <label for="end3">Gehen 3:</label>
+        <input type="time" id="end3">
+    </div>
+
+    <button onclick="calculate()">Berechnen</button>
+
+    <div class="result" id="output"></div>
+
+    <script>
+        function calculate() {
+            const targetHours = parseFloat(document.getElementById("targetHours").value) || 0;
+            const targetMinutes = Math.round(targetHours * 60);
+
+            const blocks = [
+                { start: document.getElementById("start1").value, end: document.getElementById("end1").value },
+                { start: document.getElementById("start2").value, end: document.getElementById("end2").value },
+                { start: document.getElementById("start3").value, end: document.getElementById("end3").value }
+            ];
+
+            let totalMinutes = 0;
+            let lastEndTime = null;
+            let outputHTML = "<h3>Auswertung:</h3>";
+
+            blocks.forEach((block, index) => {
+                if (block.start && block.end) {
+                    const start = new Date(`1970-01-01T${block.start}:00`);
+                    const end = new Date(`1970-01-01T${block.end}:00`);
+                    const duration = (end - start) / (1000 * 60); // Dauer in Minuten
+                    totalMinutes += duration;
+                    lastEndTime = end;
+                    outputHTML += `<p>Block ${index + 1}: ${Math.floor(duration / 60)} Stunden und ${duration % 60} Minuten gearbeitet.</p>`;
+                } else if (block.start && !block.end) {
+                    const start = new Date(`1970-01-01T${block.start}:00`);
+                    lastEndTime = start; // Setze den Startzeitpunkt als Referenz
+                } else {
+                    outputHTML += `<p>Block ${index + 1}: nicht vollständig eingetragen.</p>`;
+                }
+            });
+
+            outputHTML += `<p>Gesamtzeit: ${Math.floor(totalMinutes / 60)} Stunden und ${totalMinutes % 60} Minuten.</p>`;
+
+            const difference = totalMinutes - targetMinutes;
+
+            if (difference >= 0) {
+                outputHTML += `<p>Du hast ${Math.floor(difference / 60)} Stunden und ${difference % 60} Minuten zu viel gearbeitet.</p>`;
+            } else if (lastEndTime) {
+                const remainingMinutes = Math.abs(difference);
+                const adjustedEndTime = new Date(lastEndTime.getTime() + remainingMinutes * 60000);
+                const endTimeString = adjustedEndTime.toTimeString().slice(0, 5);
+                outputHTML += `<p>Du musst bis ${endTimeString} arbeiten, um die Zielzeit zu erreichen.</p>`;
+            } else {
+                outputHTML += `<p>Bitte trage eine gültige Startzeit ein, um die benötigte Endzeit zu berechnen.</p>`;
+            }
+
+            document.getElementById("output").innerHTML = outputHTML;
+        }
+    </script>
+</body>
+</html>
