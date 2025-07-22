@@ -7,7 +7,6 @@
 
 <style>
   html, body {
-    height: 100%;
     margin: 0;
     padding: 0;
   }
@@ -40,6 +39,9 @@
     max-width: 450px;
     width: 100%;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
   }
 
   label {
@@ -86,10 +88,10 @@
     border: 1px solid #ccc;
     border-radius: 5px;
     font-size: 0.95em;
+    display: inline-block;
   }
 </style>
 
-  
 </head>
 <body>
 
@@ -165,6 +167,8 @@ async function calculate() {
   ];
 
   let totalMinutes = 0;
+  let pauseMinutes = 0;
+  let lastEnd = null;
   let lastStartOnly = null;
   let output = `<h3>📊 Auswertung:</h3>`;
 
@@ -173,12 +177,23 @@ async function calculate() {
       const diff = (block.end - block.start) / 60000;
       totalMinutes += diff;
       output += `<p>🗂️ Block ${i + 1}: ${Math.floor(diff / 60)} Std ${Math.round(diff % 60)} Min.</p>`;
+
+      if (lastEnd && block.start > lastEnd) {
+        pauseMinutes += (block.start - lastEnd) / 60000;
+      }
+      lastEnd = block.end;
     } else if (block.start && !block.end) {
       lastStartOnly = block.start;
+      if (lastEnd && block.start > lastEnd) {
+        pauseMinutes += (block.start - lastEnd) / 60000;
+      }
     }
   });
 
   output += `<p>⏱️ Gesamtzeit: ${Math.floor(totalMinutes / 60)} Std ${Math.round(totalMinutes % 60)} Min.</p>`;
+  if (pauseMinutes > 0) {
+    output += `<p>⏸️ Pausenzeit: ${Math.floor(pauseMinutes / 60)} Std ${Math.round(pauseMinutes % 60)} Min.</p>`;
+  }
 
   const diff = totalMinutes - targetMinutes;
 
