@@ -5,41 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Arbeitszeitrechner</title>
   <style>
-    html, body {
-      height: 100%;
-      margin: 0;
-      padding: 0;
-    }
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: url('tullastr.jpg') no-repeat center center fixed;
-      background-size: cover;
-      color: #333;
+      background: #eef2f2;
       display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    body::before {
-      content: "";
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(255,255,255,0.6);
-      z-index: -1;
-    }
-    h1 {
-      text-align: center;
-      font-size: 1.6em;
-      margin: 20px 0;
+      justify-content: center;
+      padding: 20px;
     }
     main {
-      background: #f7f9f9;
+      background: #fff;
       border-radius: 10px;
       padding: 20px;
       max-width: 450px;
-      width: 90%;
+      width: 100%;
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      margin-top: 10px;
     }
     label {
       display: block;
@@ -85,131 +64,127 @@
 </head>
 <body>
 
+<main>
   <h1>🕒 Arbeitszeitrechner</h1>
 
-  <main>
-    <label for="targetHours">🎯 Ziel-Arbeitszeit (h):</label>
-    <input type="number" id="targetHours" value="7.8" step="0.1">
+  <label for="targetHours">🎯 Ziel-Arbeitszeit (h):</label>
+  <input type="number" id="targetHours" value="7.8" step="0.1">
 
-    <h2>✍️ Arbeitsblöcke</h2>
+  <h2>✍️ Arbeitsblöcke</h2>
 
-    <div class="time-row">
-      <div>
-        <label for="start1">➡️ Kommen 1:</label>
-        <input type="text" inputmode="numeric" pattern="[0-9]*" id="start1" placeholder="08:00">
-      </div>
-      <div>
-        <label for="end1">⬅️ Gehen 1:</label>
-        <input type="text" inputmode="numeric" pattern="[0-9]*" id="end1" placeholder="12:00">
-      </div>
+  <div class="time-row">
+    <div>
+      <label for="start1">➡️ Kommen 1:</label>
+      <input type="text" id="start1" placeholder="0815">
     </div>
-
-    <div class="time-row">
-      <div>
-        <label for="start2">➡️ Kommen 2:</label>
-        <input type="text" inputmode="numeric" pattern="[0-9]*" id="start2" placeholder="13:00">
-      </div>
-      <div>
-        <label for="end2">⬅️ Gehen 2:</label>
-        <input type="text" inputmode="numeric" pattern="[0-9]*" id="end2" placeholder="17:00">
-      </div>
+    <div>
+      <label for="end1">⬅️ Gehen 1:</label>
+      <input type="text" id="end1" placeholder="1203">
     </div>
+  </div>
 
-    <div class="time-row">
-      <div>
-        <label for="start3">➡️ Kommen 3:</label>
-        <input type="text" inputmode="numeric" pattern="[0-9]*" id="start3" placeholder="">
-      </div>
-      <div>
-        <label for="end3">⬅️ Gehen 3:</label>
-        <input type="text" inputmode="numeric" pattern="[0-9]*" id="end3" placeholder="">
-      </div>
+  <div class="time-row">
+    <div>
+      <label for="start2">➡️ Kommen 2:</label>
+      <input type="text" id="start2">
     </div>
+    <div>
+      <label for="end2">⬅️ Gehen 2:</label>
+      <input type="text" id="end2">
+    </div>
+  </div>
 
-    <button onclick="calculate()">✅ Berechnen</button>
+  <div class="time-row">
+    <div>
+      <label for="start3">➡️ Kommen 3:</label>
+      <input type="text" id="start3">
+    </div>
+    <div>
+      <label for="end3">⬅️ Gehen 3:</label>
+      <input type="text" id="end3">
+    </div>
+  </div>
 
-    <div class="result" id="output"></div>
-  </main>
+  <button onclick="calculate()">✅ Berechnen</button>
+  <div class="result" id="output"></div>
+</main>
 
-  <script>
-    function parseTime(input) {
-      if (!input) return null;
-      input = input.replace(/\D/g, ''); // nur Ziffern
-      if (input.length === 4) {
-        const h = parseInt(input.slice(0,2));
-        const m = parseInt(input.slice(2,4));
-        if (h >= 0 && h < 24 && m >= 0 && m < 60) {
-          return new Date(`1970-01-01T${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:00`);
-        }
-      } else if (input.length === 5 && input.includes(':')) {
-        const [h,m] = input.split(':').map(Number);
-        if (h >= 0 && h < 24 && m >= 0 && m < 60) {
-          return new Date(`1970-01-01T${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:00`);
-        }
-      }
-      return null;
+<script>
+function parseTime(input) {
+  if (!input) return null;
+  input = input.replace(/\D/g, '');
+  if (input.length === 4) {
+    const h = parseInt(input.slice(0, 2));
+    const m = parseInt(input.slice(2, 4));
+    if (h >= 0 && h < 24 && m >= 0 && m < 60) {
+      return new Date(1970, 0, 1, h, m);
     }
+  }
+  return null;
+}
 
-    async function calculate() {
-      const targetHours = parseFloat(document.getElementById("targetHours").value) || 0;
-      const targetMinutes = Math.round(targetHours * 60);
+async function calculate() {
+  const targetHours = parseFloat(document.getElementById("targetHours").value) || 0;
+  const targetMinutes = Math.round(targetHours * 60);
 
-      const blocks = [
-        { start: parseTime(document.getElementById("start1").value), end: parseTime(document.getElementById("end1").value) },
-        { start: parseTime(document.getElementById("start2").value), end: parseTime(document.getElementById("end2").value) },
-        { start: parseTime(document.getElementById("start3").value), end: parseTime(document.getElementById("end3").value) }
-      ];
+  const getTime = id => parseTime(document.getElementById(id).value);
 
-      let totalMinutes = 0;
-      let lastEndTime = null;
-      let outputHTML = "<h3>📊 Auswertung:</h3>";
+  const blocks = [
+    { start: getTime("start1"), end: getTime("end1") },
+    { start: getTime("start2"), end: getTime("end2") },
+    { start: getTime("start3"), end: getTime("end3") }
+  ];
 
-      blocks.forEach((block, index) => {
-        if (block.start && block.end) {
-          const duration = (block.end - block.start) / (1000 * 60);
-          totalMinutes += duration;
-          lastEndTime = block.end;
-          outputHTML += `<p>🗂️ Block ${index + 1}: ${Math.floor(duration / 60)} Std ${duration % 60} Min.</p>`;
-        }
-      });
+  let totalMinutes = 0;
+  let lastStartOnly = null;
+  let output = `<h3>📊 Auswertung:</h3>`;
 
-      outputHTML += `<p>⏱️ Gesamtzeit: ${Math.floor(totalMinutes / 60)} Std ${totalMinutes % 60} Min.</p>`;
-
-      const difference = totalMinutes - targetMinutes;
-
-      if (difference >= 0) {
-        outputHTML += `<p>✅ Du hast ${Math.floor(difference / 60)} Std ${difference % 60} Min mehr gearbeitet als geplant.</p>`;
-      } else if (lastEndTime) {
-        const remainingMinutes = Math.abs(difference);
-        const adjustedEndTime = new Date(lastEndTime.getTime() + remainingMinutes * 60000);
-        const endTimeString = adjustedEndTime.toTimeString().slice(0,5);
-        outputHTML += `<p>🕔 Um dein Ziel zu erreichen, müsstest du bis ca. ${endTimeString} bleiben.</p>`;
-
-        // Hole Wettervorhersage für Feierabend
-        try {
-          const forecastRes = await fetch('/api/forecast?city=Freiburg');
-          const forecastData = await forecastRes.json();
-          if (forecastData.list && forecastData.list.length > 0) {
-            const feierabend = forecastData.list.find(fc => {
-              const fcTime = new Date(fc.dt * 1000);
-              return fcTime >= adjustedEndTime;
-            }) || forecastData.list[0];
-
-            const desc = feierabend.weather[0].description;
-            const temp = feierabend.main.temp;
-            outputHTML += `<p>🌤️ Wetter bei Feierabend: ${desc}, ca. ${temp.toFixed(1)}°C.</p>`;
-          }
-        } catch (error) {
-          outputHTML += `<p>⚠️ Wettervorhersage nicht verfügbar.</p>`;
-        }
-
-      } else {
-        outputHTML += `<p>❗ Bitte trage mindestens eine gültige Startzeit ein.</p>`;
-      }
-
-      document.getElementById("output").innerHTML = outputHTML;
+  blocks.forEach((block, i) => {
+    if (block.start && block.end) {
+      const diff = (block.end - block.start) / 60000;
+      totalMinutes += diff;
+      output += `<p>🗂️ Block ${i + 1}: ${Math.floor(diff / 60)} Std ${Math.round(diff % 60)} Min.</p>`;
+    } else if (block.start && !block.end) {
+      lastStartOnly = block.start;
     }
-  </script>
+  });
+
+  output += `<p>⏱️ Gesamtzeit: ${Math.floor(totalMinutes / 60)} Std ${Math.round(totalMinutes % 60)} Min.</p>`;
+
+  const diff = totalMinutes - targetMinutes;
+
+  if (diff >= 0) {
+    output += `<p>✅ Du hast ${Math.floor(diff / 60)} Std ${Math.round(diff % 60)} Min mehr gearbeitet als geplant.</p>`;
+  } else if (lastStartOnly) {
+    const remaining = Math.abs(diff);
+    const adjustedEnd = new Date(lastStartOnly.getTime() + remaining * 60000);
+    const endStr = adjustedEnd.toTimeString().slice(0, 5);
+    output += `<p>🕔 Um dein Ziel zu erreichen, müsstest du bis ca. ${endStr} bleiben.</p>`;
+
+    // Wetterdaten abrufen
+    try {
+      const forecastRes = await fetch('/api/forecast?city=Freiburg');
+      const forecastData = await forecastRes.json();
+      if (forecastData.list && forecastData.list.length > 0) {
+        const feierabend = forecastData.list.find(fc => {
+          const fcTime = new Date(fc.dt * 1000);
+          return fcTime >= adjustedEnd;
+        }) || forecastData.list[0];
+
+        const desc = feierabend.weather[0].description;
+        const temp = feierabend.main.temp;
+        output += `<p>🌤️ Wetter bei Feierabend: ${desc}, ca. ${temp.toFixed(1)}°C.</p>`;
+      }
+    } catch (err) {
+      output += `<p>⚠️ Wettervorhersage nicht verfügbar.</p>`;
+    }
+  } else {
+    output += `<p>❗ Bitte gib mindestens einen gültigen Startzeitpunkt ein.</p>`;
+  }
+
+  document.getElementById("output").innerHTML = output;
+}
+</script>
 
 </body>
 </html>
