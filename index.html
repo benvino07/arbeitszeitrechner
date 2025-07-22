@@ -4,63 +4,92 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Arbeitszeitrechner</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #eef2f2;
-      display: flex;
-      justify-content: center;
-      padding: 20px;
-    }
-    main {
-      background: #fff;
-      border-radius: 10px;
-      padding: 20px;
-      max-width: 450px;
-      width: 100%;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-    label {
-      display: block;
-      margin-top: 15px;
-      font-weight: bold;
-    }
-    input {
-      font-size: 1.1em;
-      width: 100%;
-      padding: 8px;
-      margin-top: 5px;
-      box-sizing: border-box;
-    }
-    .time-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      align-items: center;
-    }
-    button {
-      font-size: 1.2em;
-      width: 100%;
-      padding: 10px;
-      margin-top: 20px;
-      background: #004d60;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    button:hover {
-      background: #0a6b74;
-    }
-    .result {
-      margin-top: 20px;
-      padding: 10px;
-      background-color: #eef2f2;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      font-size: 0.95em;
-    }
-  </style>
+
+<style>
+  html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: url('tullastr.jpg') no-repeat center center fixed;
+    background-size: cover;
+    color: #333;
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+    position: relative;
+    z-index: 0;
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(255, 255, 255, 0.6);
+    z-index: -1;
+  }
+
+  main {
+    background: #fff;
+    border-radius: 10px;
+    padding: 20px;
+    max-width: 450px;
+    width: 100%;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+
+  label {
+    display: block;
+    margin-top: 15px;
+    font-weight: bold;
+  }
+
+  input {
+    font-size: 1.1em;
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    box-sizing: border-box;
+  }
+
+  .time-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    align-items: center;
+  }
+
+  button {
+    font-size: 1.2em;
+    width: 100%;
+    padding: 10px;
+    margin-top: 20px;
+    background: #004d60;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  button:hover {
+    background: #0a6b74;
+  }
+
+  .result {
+    margin-top: 20px;
+    padding: 10px;
+    background-color: #eef2f2;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 0.95em;
+  }
+</style>
+
+  
 </head>
 <body>
 
