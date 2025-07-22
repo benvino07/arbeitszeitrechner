@@ -1,131 +1,205 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arbeitszeitrechner</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        label {
-            display: inline-block;
-            width: 100px;
-            margin-right: 10px;
-        }
-        input {
-            padding: 8px;
-            width: 100px;
-            box-sizing: border-box;
-        }
-        .time-row {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        button {
-            padding: 10px 15px;
-            background-color: #007bff;
-            color: #fff;
-            border: none;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-        .result {
-            margin-top: 20px;
-            padding: 10px;
-            background-color: #f8f9fa;
-            border: 1px solid #ddd;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Arbeitszeitrechner</title>
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: url('tullastr.jpg') no-repeat center center fixed;
+      background-size: cover;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(255,255,255,0.6);
+      z-index: -1;
+    }
+    h1 {
+      text-align: center;
+      font-size: 1.6em;
+      margin: 20px 0;
+    }
+    main {
+      background: #f7f9f9;
+      border-radius: 10px;
+      padding: 20px;
+      max-width: 450px;
+      width: 90%;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      margin-top: 10px;
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+    input[type="number"], input[type="time"] {
+      font-size: 1.1em;
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      box-sizing: border-box;
+    }
+    .time-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      align-items: center;
+    }
+    button {
+      font-size: 1.2em;
+      width: 100%;
+      padding: 10px;
+      margin-top: 20px;
+      background: #004d60;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #0a6b74;
+    }
+    .result {
+      margin-top: 20px;
+      padding: 10px;
+      background-color: #eef2f2;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 0.95em;
+    }
+  </style>
 </head>
 <body>
-    <h1>Arbeitszeitrechner</h1>
-    <div class="form-group">
-        <label for="targetHours">Ziel-Arbeitszeit (in Stunden):</label>
-        <input type="number" id="targetHours" value="7.8" step="0.1">
-    </div>
 
-    <h2>Arbeitsblöcke</h2>
-    <div class="form-group time-row">
-        <label for="start1">Kommen 1:</label>
+  <h1>🕒 Arbeitszeitrechner</h1>
+
+  <main>
+    <label for="targetHours">🎯 Ziel-Arbeitszeit (h):</label>
+    <input type="number" id="targetHours" value="7.8" step="0.1">
+
+    <h2>✍️ Arbeitsblöcke</h2>
+
+    <div class="time-row">
+      <div>
+        <label for="start1">➡️ Kommen 1:</label>
         <input type="time" id="start1">
-        <label for="end1">Gehen 1:</label>
+      </div>
+      <div>
+        <label for="end1">⬅️ Gehen 1:</label>
         <input type="time" id="end1">
+      </div>
     </div>
 
-    <div class="form-group time-row">
-        <label for="start2">Kommen 2:</label>
+    <div class="time-row">
+      <div>
+        <label for="start2">➡️ Kommen 2:</label>
         <input type="time" id="start2">
-        <label for="end2">Gehen 2:</label>
+      </div>
+      <div>
+        <label for="end2">⬅️ Gehen 2:</label>
         <input type="time" id="end2">
+      </div>
     </div>
 
-    <div class="form-group time-row">
-        <label for="start3">Kommen 3:</label>
+    <div class="time-row">
+      <div>
+        <label for="start3">➡️ Kommen 3:</label>
         <input type="time" id="start3">
-        <label for="end3">Gehen 3:</label>
+      </div>
+      <div>
+        <label for="end3">⬅️ Gehen 3:</label>
         <input type="time" id="end3">
+      </div>
     </div>
 
-    <button onclick="calculate()">Berechnen</button>
+    <button onclick="calculate()">✅ Berechnen</button>
 
     <div class="result" id="output"></div>
+  </main>
 
-    <script>
-        function calculate() {
-            const targetHours = parseFloat(document.getElementById("targetHours").value) || 0;
-            const targetMinutes = Math.round(targetHours * 60);
+  <script>
+    async function calculate() {
+      const targetHours = parseFloat(document.getElementById("targetHours").value) || 0;
+      const targetMinutes = Math.round(targetHours * 60);
 
-            const blocks = [
-                { start: document.getElementById("start1").value, end: document.getElementById("end1").value },
-                { start: document.getElementById("start2").value, end: document.getElementById("end2").value },
-                { start: document.getElementById("start3").value, end: document.getElementById("end3").value }
-            ];
+      const blocks = [
+        { start: document.getElementById("start1").value, end: document.getElementById("end1").value },
+        { start: document.getElementById("start2").value, end: document.getElementById("end2").value },
+        { start: document.getElementById("start3").value, end: document.getElementById("end3").value }
+      ];
 
-            let totalMinutes = 0;
-            let lastEndTime = null;
-            let outputHTML = "<h3>Auswertung:</h3>";
+      let totalMinutes = 0;
+      let lastEndTime = null;
+      let outputHTML = "<h3>📊 Auswertung:</h3>";
 
-            blocks.forEach((block, index) => {
-                if (block.start && block.end) {
-                    const start = new Date(`1970-01-01T${block.start}:00`);
-                    const end = new Date(`1970-01-01T${block.end}:00`);
-                    const duration = (end - start) / (1000 * 60); // Dauer in Minuten
-                    totalMinutes += duration;
-                    lastEndTime = end;
-                    outputHTML += `<p>Block ${index + 1}: ${Math.floor(duration / 60)} Stunden und ${duration % 60} Minuten gearbeitet.</p>`;
-                } else if (block.start && !block.end) {
-                    const start = new Date(`1970-01-01T${block.start}:00`);
-                    lastEndTime = start; // Setze den Startzeitpunkt als Referenz
-                } else {
-                    outputHTML += `<p>Block ${index + 1}: nicht vollständig eingetragen.</p>`;
-                }
-            });
-
-            outputHTML += `<p>Gesamtzeit: ${Math.floor(totalMinutes / 60)} Stunden und ${totalMinutes % 60} Minuten.</p>`;
-
-            const difference = totalMinutes - targetMinutes;
-
-            if (difference >= 0) {
-                outputHTML += `<p>Du hast ${Math.floor(difference / 60)} Stunden und ${difference % 60} Minuten zu viel gearbeitet.</p>`;
-            } else if (lastEndTime) {
-                const remainingMinutes = Math.abs(difference);
-                const adjustedEndTime = new Date(lastEndTime.getTime() + remainingMinutes * 60000);
-                const endTimeString = adjustedEndTime.toTimeString().slice(0, 5);
-                outputHTML += `<p>Du musst bis ${endTimeString} arbeiten, um die Zielzeit zu erreichen.</p>`;
-            } else {
-                outputHTML += `<p>Bitte trage eine gültige Startzeit ein, um die benötigte Endzeit zu berechnen.</p>`;
-            }
-
-            document.getElementById("output").innerHTML = outputHTML;
+      blocks.forEach((block, index) => {
+        if (block.start && block.end) {
+          const start = new Date(`1970-01-01T${block.start}:00`);
+          const end = new Date(`1970-01-01T${block.end}:00`);
+          const duration = (end - start) / (1000 * 60);
+          totalMinutes += duration;
+          lastEndTime = end;
+          outputHTML += `<p>🗂️ Block ${index + 1}: ${Math.floor(duration / 60)} Std ${duration % 60} Min.</p>`;
+        } else if (block.start && !block.end) {
+          const start = new Date(`1970-01-01T${block.start}:00`);
+          lastEndTime = start;
+        } else {
+          outputHTML += `<p>⚠️ Block ${index + 1}: unvollständig.</p>`;
         }
-    </script>
+      });
+
+      outputHTML += `<p>⏱️ Gesamtzeit: ${Math.floor(totalMinutes / 60)} Std ${totalMinutes % 60} Min.</p>`;
+
+      const difference = totalMinutes - targetMinutes;
+
+      if (difference >= 0) {
+        outputHTML += `<p>✅ Du hast ${Math.floor(difference / 60)} Std ${difference % 60} Min mehr gearbeitet als geplant.</p>`;
+      } else if (lastEndTime) {
+        const remainingMinutes = Math.abs(difference);
+        const adjustedEndTime = new Date(lastEndTime.getTime() + remainingMinutes * 60000);
+        const endTimeString = adjustedEndTime.toTimeString().slice(0, 5);
+        outputHTML += `<p>🕔 Um dein Ziel zu erreichen, müsstest du bis ca. ${endTimeString} bleiben.</p>`;
+
+        // Hole Wettervorhersage für Feierabend
+        try {
+          const forecastRes = await fetch('/api/forecast?city=Freiburg');
+          const forecastData = await forecastRes.json();
+          if (forecastData.list && forecastData.list.length > 0) {
+            // Suche nächste Vorhersage nach adjustedEndTime
+            const feierabend = forecastData.list.find(fc => {
+              const fcTime = new Date(fc.dt * 1000);
+              return fcTime >= adjustedEndTime;
+            }) || forecastData.list[0];
+
+            const desc = feierabend.weather[0].description;
+            const temp = feierabend.main.temp;
+            outputHTML += `<p>🌤️ Wetter bei Feierabend: ${desc}, ca. ${temp.toFixed(1)}°C.</p>`;
+          }
+        } catch (error) {
+          outputHTML += `<p>⚠️ Wettervorhersage nicht verfügbar.</p>`;
+        }
+
+      } else {
+        outputHTML += `<p>❗ Bitte trage mindestens eine gültige Startzeit ein.</p>`;
+      }
+
+      document.getElementById("output").innerHTML = outputHTML;
+    }
+  </script>
+
 </body>
 </html>
