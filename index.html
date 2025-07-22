@@ -46,7 +46,7 @@
       margin-top: 15px;
       font-weight: bold;
     }
-    input[type="number"], input[type="time"] {
+    input {
       font-size: 1.1em;
       width: 100%;
       padding: 8px;
@@ -96,33 +96,33 @@
     <div class="time-row">
       <div>
         <label for="start1">➡️ Kommen 1:</label>
-        <input type="time" id="start1">
+        <input type="text" inputmode="numeric" pattern="[0-9]*" id="start1" placeholder="08:00">
       </div>
       <div>
         <label for="end1">⬅️ Gehen 1:</label>
-        <input type="time" id="end1">
+        <input type="text" inputmode="numeric" pattern="[0-9]*" id="end1" placeholder="12:00">
       </div>
     </div>
 
     <div class="time-row">
       <div>
         <label for="start2">➡️ Kommen 2:</label>
-        <input type="time" id="start2">
+        <input type="text" inputmode="numeric" pattern="[0-9]*" id="start2" placeholder="13:00">
       </div>
       <div>
         <label for="end2">⬅️ Gehen 2:</label>
-        <input type="time" id="end2">
+        <input type="text" inputmode="numeric" pattern="[0-9]*" id="end2" placeholder="17:00">
       </div>
     </div>
 
     <div class="time-row">
       <div>
         <label for="start3">➡️ Kommen 3:</label>
-        <input type="time" id="start3">
+        <input type="text" inputmode="numeric" pattern="[0-9]*" id="start3" placeholder="">
       </div>
       <div>
         <label for="end3">⬅️ Gehen 3:</label>
-        <input type="time" id="end3">
+        <input type="text" inputmode="numeric" pattern="[0-9]*" id="end3" placeholder="">
       </div>
     </div>
 
@@ -132,14 +132,32 @@
   </main>
 
   <script>
+    function parseTime(input) {
+      if (!input) return null;
+      input = input.replace(/\D/g, ''); // nur Ziffern
+      if (input.length === 4) {
+        const h = parseInt(input.slice(0,2));
+        const m = parseInt(input.slice(2,4));
+        if (h >= 0 && h < 24 && m >= 0 && m < 60) {
+          return new Date(`1970-01-01T${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:00`);
+        }
+      } else if (input.length === 5 && input.includes(':')) {
+        const [h,m] = input.split(':').map(Number);
+        if (h >= 0 && h < 24 && m >= 0 && m < 60) {
+          return new Date(`1970-01-01T${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:00`);
+        }
+      }
+      return null;
+    }
+
     async function calculate() {
       const targetHours = parseFloat(document.getElementById("targetHours").value) || 0;
       const targetMinutes = Math.round(targetHours * 60);
 
       const blocks = [
-        { start: document.getElementById("start1").value, end: document.getElementById("end1").value },
-        { start: document.getElementById("start2").value, end: document.getElementById("end2").value },
-        { start: document.getElementById("start3").value, end: document.getElementById("end3").value }
+        { start: parseTime(document.getElementById("start1").value), end: parseTime(document.getElementById("end1").value) },
+        { start: parseTime(document.getElementById("start2").value), end: parseTime(document.getElementById("end2").value) },
+        { start: parseTime(document.getElementById("start3").value), end: parseTime(document.getElementById("end3").value) }
       ];
 
       let totalMinutes = 0;
@@ -148,17 +166,10 @@
 
       blocks.forEach((block, index) => {
         if (block.start && block.end) {
-          const start = new Date(`1970-01-01T${block.start}:00`);
-          const end = new Date(`1970-01-01T${block.end}:00`);
-          const duration = (end - start) / (1000 * 60);
+          const duration = (block.end - block.start) / (1000 * 60);
           totalMinutes += duration;
-          lastEndTime = end;
+          lastEndTime = block.end;
           outputHTML += `<p>🗂️ Block ${index + 1}: ${Math.floor(duration / 60)} Std ${duration % 60} Min.</p>`;
-        } else if (block.start && !block.end) {
-          const start = new Date(`1970-01-01T${block.start}:00`);
-          lastEndTime = start;
-        } else {
-          outputHTML += `<p>⚠️ Block ${index + 1}: unvollständig.</p>`;
         }
       });
 
@@ -171,7 +182,7 @@
       } else if (lastEndTime) {
         const remainingMinutes = Math.abs(difference);
         const adjustedEndTime = new Date(lastEndTime.getTime() + remainingMinutes * 60000);
-        const endTimeString = adjustedEndTime.toTimeString().slice(0, 5);
+        const endTimeString = adjustedEndTime.toTimeString().slice(0,5);
         outputHTML += `<p>🕔 Um dein Ziel zu erreichen, müsstest du bis ca. ${endTimeString} bleiben.</p>`;
 
         // Hole Wettervorhersage für Feierabend
@@ -179,7 +190,6 @@
           const forecastRes = await fetch('/api/forecast?city=Freiburg');
           const forecastData = await forecastRes.json();
           if (forecastData.list && forecastData.list.length > 0) {
-            // Suche nächste Vorhersage nach adjustedEndTime
             const feierabend = forecastData.list.find(fc => {
               const fcTime = new Date(fc.dt * 1000);
               return fcTime >= adjustedEndTime;
